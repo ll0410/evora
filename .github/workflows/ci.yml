@@ -1,0 +1,93 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+env:
+  NODE_VERSION: '22'
+  PNPM_VERSION: '10'
+
+jobs:
+  quality:
+    name: Lint / Typecheck / Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+      - run: pnpm install --no-frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm build:cli
+      - name: 用本地 CLI 生成三个模板项目
+        run: |
+          node packages/create-evora/dist/index.js evora-vue-ts --template vue-ts --pm pnpm --no-git --no-install
+          node packages/create-evora/dist/index.js evora-element --template vue-ts-element --pm pnpm --no-git --no-install
+          node packages/create-evora/dist/index.js evora-monorepo --template vue-ts-monorepo --pm pnpm --no-git --no-install
+          test -f evora-vue-ts/package.json
+          test -f evora-element/package.json
+          test -f evora-monorepo/pnpm-workspace.yaml
+
+  templates:
+    name: Template build (${{ matrix.template }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        template: [vue-ts, vue-ts-element, vue-ts-monorepo]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: 安装模板依赖
+        working-directory: templates/${{ matrix.template }}
+        run: pnpm install --no-frozen-lockfile
+      - name: Lint
+        working-directory: templates/${{ matrix.template }}
+        run: pnpm lint
+      - name: Typecheck
+        working-directory: templates/${{ matrix.template }}
+        run: pnpm typecheck
+      - name: Test
+        working-directory: templates/${{ matrix.template }}
+        run: pnpm test
+      - name: Build
+        working-directory: templates/${{ matrix.template }}
+        run: pnpm build
+      - name: 打包目录（electron-builder --dir）
+        working-directory: templates/${{ matrix.template }}
+        run: pnpm package
+
+  e2e:
+    name: Playwright Electron smoke
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+      - run: pnpm install --no-frozen-lockfile
+      - name: 安装 vue-ts 模板依赖
+        working-directory: templates/vue-ts
+        run: pnpm install --no-frozen-lockfile
+      - name: 构建 vue-ts 模板
+        working-directory: templates/vue-ts
+        run: pnpm build
+      - name: 启动 Electron 冒烟测试（xvfb）
+        run: xvfb-run --auto-servernum pnpm test:e2e

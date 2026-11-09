@@ -1,0 +1,44 @@
+appId: com.evora.desktop
+# 生成项目时由 create-evora 替换为你的项目名
+productName: '{{projectName}}'
+copyright: Copyright © 2026 Evora
+
+directories:
+  buildResources: build
+
+files:
+  - '!**/.vscode/*'
+  - '!src/*'
+  - '!electron.vite.config.{js,ts,mjs,cjs}'
+  - '!{.eslintcache,eslint.config.mjs,.prettierrc.json,.prettierignore}'
+  - '!{tsconfig.json,tsconfig.*.json}'
+  - '!{README.md,DevPlan.md}'
+  - '!{.env,.env.*,.npmrc,pnpm-lock.yaml,package-lock.json,yarn.lock}'
+  - '!{test,coverage,dist,out/*.map}'
+
+asarUnpack:
+  - resources/**
+
+win:
+  target:
+    - nsis
+  icon: build/icon.png
+
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+
+mac:
+  target:
+    - dmg
+  category: public.app-category.developer-tools
+  icon: build/icon.png
+
+linux:
+  target:
+    - AppImage
+  category: Utility
+  icon: build/icon.png
+
+# 自动更新：使用 electron-updater 的 generic / github provider 时填写
+publish: null

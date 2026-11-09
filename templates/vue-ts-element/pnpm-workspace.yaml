@@ -1,0 +1,9 @@
+# 模板本身即独立的 pnpm 项目根，避免误用上层 workspace。
+packages:
+  - '.'
+
+# pnpm 10 默认阻止依赖构建脚本，Electron 需要下载对应平台的二进制
+onlyBuiltDependencies:
+  - electron
+  - esbuild
+  - electron-winstaller

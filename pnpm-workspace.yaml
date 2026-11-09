@@ -1,0 +1,5 @@
+# 根 workspace 只包含脚手架自身的工具包。
+# templates/* 是独立可安装的模板工程，必须能在脱离本仓库的情况下单独
+# `pnpm install`，因此不并入根 workspace（避免依赖提升掩盖缺失依赖）。
+packages:
+  - packages/*

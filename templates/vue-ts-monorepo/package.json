@@ -1,0 +1,23 @@
+{
+  "name": "@evora/template-vue-ts-monorepo",
+  "version": "0.0.0",
+  "private": true,
+  "description": "{{description}}",
+  "packageManager": "pnpm@10.34.9",
+  "engines": {
+    "node": ">=20.19.0"
+  },
+  "scripts": {
+    "dev": "turbo run dev --filter=@app/desktop",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "package": "turbo run build && pnpm --filter @app/desktop package",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "prettier": "^3.9.10",
+    "turbo": "^2.11.10"
+  }
+}

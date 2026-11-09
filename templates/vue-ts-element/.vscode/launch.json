@@ -1,0 +1,42 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug Main Process",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron-vite",
+      "windows": {
+        "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron-vite.cmd"
+      },
+      "runtimeArgs": ["--sourcemap", "--inspect=5858", "dev"],
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"],
+      "outFiles": ["${workspaceFolder}/out/**/*.js"]
+    },
+    {
+      "name": "Debug Renderer Process",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:5173",
+      "webRoot": "${workspaceFolder}/src/renderer",
+      "sourceMaps": true
+    },
+    {
+      "name": "Attach Preload (5858)",
+      "type": "node",
+      "request": "attach",
+      "port": 5858,
+      "restart": true,
+      "sourceMaps": true,
+      "skipFiles": ["<node_internals>/**"]
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Debug Main + Renderer",
+      "configurations": ["Debug Main Process", "Debug Renderer Process"]
+    }
+  ]
+}
